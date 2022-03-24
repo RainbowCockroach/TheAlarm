@@ -7,17 +7,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.SystemClock;
+import android.util.Log;
 
 import java.time.LocalDateTime;
 import java.util.Calendar;
 
 public class AlarmController {
+    private static final String TAG = "alarmController";
     private Context context;
     private AlarmManager alarmManager;
+    private AlarmDAO alarmDAO;
 
     public AlarmController(Context context) {
         this.context = context;
         this.alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        AppDatabase db = AppDatabase.getDatabase(context);
+        this.alarmDAO = db.alarmDAO();
     }
 
     private PendingIntent makeAlarmIntent(Alarm theAlarm) {
@@ -26,12 +31,22 @@ public class AlarmController {
         return PendingIntent.getActivity(context, theAlarm.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
+    public void createAlarm(Alarm theAlarm) {
+        alarmDAO.insert(theAlarm);
+        if (theAlarm.getRepeatTime() > 0) {
+            setRepeatAlarm(theAlarm);
+        } else {
+            setOneTimeAlarm(theAlarm);
+        }
+    }
+
     public void setOneTimeAlarm(Alarm theAlarm) {
         PendingIntent alarmIntent = makeAlarmIntent(theAlarm);
+        Log.d(TAG, "setOneTimeAlarm: start time: "+ theAlarm.getStartTime());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, theAlarm.getStartTime(), alarmIntent);
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, theAlarm.getStartTime(), alarmIntent);
         } else {
-            alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, theAlarm.getStartTime(), alarmIntent);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, theAlarm.getStartTime(), alarmIntent);
         }
     }
 

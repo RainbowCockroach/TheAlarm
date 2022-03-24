@@ -2,6 +2,7 @@ package com.example.thealarm;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.util.Calendar;
@@ -29,6 +30,7 @@ public class Alarm {
     @ColumnInfo(name = "group_id")
     private String groupId;
 
+    @Ignore
     public Alarm(int hour, int minutes, String name) {
         this.id = generateAlarmId();
         this.name = name;
@@ -36,12 +38,24 @@ public class Alarm {
         this.startTime = getAlarmTimeInMilis(hour, minutes);
     }
 
+    @Ignore
     public Alarm(int hour, int minutes, String name, long repeatTime) {
         this.id = generateAlarmId();
         this.name = name;
         this.isOn = true;
         this.startTime = getAlarmTimeInMilis(hour, minutes);
         this.repeatTime = repeatTime;
+    }
+
+    public Alarm(int id, String name, boolean isOn, long startTime, long repeatTime, String timeString, String sound, String groupId) {
+        this.id = id;
+        this.name = name;
+        this.isOn = isOn;
+        this.startTime = startTime;
+        this.repeatTime = repeatTime;
+        this.timeString = timeString;
+        this.sound = sound;
+        this.groupId = groupId;
     }
 
     private int generateAlarmId() {
@@ -118,5 +132,12 @@ public class Alarm {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    @Override
+    public String toString() {
+        return "Alarm{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }
