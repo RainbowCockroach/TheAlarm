@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import java.time.LocalDateTime;
 import java.util.Calendar;
 
 // Cho tính năng báo thức bình thường
@@ -16,64 +15,108 @@ public class Alarm {
     private String name;
     @ColumnInfo(name = "is_on")
     private boolean isOn; // Báo thức có đang bật hay đang tắt
-    @ColumnInfo(name = "is_repeat")
-    private boolean isRepeat; // = true: báo thức lặp lại, không thì là báo thức 1 lần
-    @ColumnInfo(name = "start_time")
-    private LocalDateTime startTime;
+    // Báo thức cơ bản
+    @ColumnInfo(name = "start_time_milis")
+    private long startTime;
+    @ColumnInfo(name = "repeat_time_milis")
+    private long repeatTime;
+    // CRON
     @ColumnInfo(name = "cron_time")
     private String timeString; // Kiểu cron
+    // OPTIONS
     @ColumnInfo(name = "sound")
     private String sound; // File âm thanh khi báo thức kêu
     @ColumnInfo(name = "group_id")
-    // Có thể có hoặc không - tính năng làm thêm
     private String groupId;
 
-    public Alarm(String name, boolean isOn, boolean isRepeat, LocalDateTime startTime, String timeString) {
-        this.id = (int) System.currentTimeMillis();
+    public Alarm(int hour, int minutes, String name) {
+        this.id = generateAlarmId();
         this.name = name;
-        this.isOn = isOn;
-        this.isRepeat = isRepeat;
-        this.startTime = startTime;
-        this.timeString = timeString;
+        this.isOn = true;
+        this.startTime = getAlarmTimeInMilis(hour, minutes);
     }
 
-    public void setSound(String sound) {
-        this.sound = sound;
+    public Alarm(int hour, int minutes, String name, long repeatTime) {
+        this.id = generateAlarmId();
+        this.name = name;
+        this.isOn = true;
+        this.startTime = getAlarmTimeInMilis(hour, minutes);
+        this.repeatTime = repeatTime;
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    private int generateAlarmId() {
+        return (int) System.currentTimeMillis();
+    }
+
+    public long getAlarmTimeInMilis(int hour, int minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        return calendar.getTimeInMillis();
     }
 
     public int getId() {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public boolean isOn() {
         return isOn;
     }
 
-    public boolean isRepeat() {
-        return isRepeat;
+    public void setOn(boolean on) {
+        isOn = on;
     }
 
-    public LocalDateTime getStartTime() {
+    public long getStartTime() {
         return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public long getRepeatTime() {
+        return repeatTime;
+    }
+
+    public void setRepeatTime(long repeatTime) {
+        this.repeatTime = repeatTime;
     }
 
     public String getTimeString() {
         return timeString;
     }
 
+    public void setTimeString(String timeString) {
+        this.timeString = timeString;
+    }
+
     public String getSound() {
         return sound;
     }
 
+    public void setSound(String sound) {
+        this.sound = sound;
+    }
+
     public String getGroupId() {
         return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }

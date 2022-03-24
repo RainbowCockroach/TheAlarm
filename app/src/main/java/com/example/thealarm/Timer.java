@@ -21,7 +21,15 @@ public class Timer {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public long getTimePassInMiliseconds() {
         return timePassInMiliseconds;
+    }
+
+    public void setTimePassInMiliseconds(long timePassInMiliseconds) {
+        this.timePassInMiliseconds = timePassInMiliseconds;
     }
 }
