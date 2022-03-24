@@ -13,33 +13,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TheAlarm">
         <activity
+            android:name=".Test_ChainIntent"
+            android:exported="false" />
+        <activity
+            android:name=".Test_AlarmActivity"
+            android:exported="false" />
+        <activity
             android:name=".AlarmGoOffActivity"
             android:exported="false" />
-        <activity
-            android:name=".TestCRONParse"
-            android:exported="false" />
-        <activity
-            android:name=".NotificationActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AlarmActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Test_Alarm"
-            android:exported="false" />
-        <activity
-            android:name=".Test_AlarmGoOffActivity"
-            android:exported="false" />
-
-        <receiver
-            android:name=".AlarmPermissionChangeReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name=".MainActivity"
             android:exported="true">

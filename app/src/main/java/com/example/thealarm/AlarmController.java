@@ -38,28 +38,25 @@ public class AlarmController {
         this.alarmDAO = db.alarmDAO();
     }
 
-    private PendingIntent makeAlarmIntent(Alarm theAlarm) {
-        Intent intent = new Intent(context, AlarmGoOffActivity.class);
-        intent.putExtra("alarmId", theAlarm.getId());
-        if (theAlarm.getCronString() != null) {
-            intent.putExtra("cron", theAlarm.getCronString());
-        }
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        return PendingIntent.getActivity(context, theAlarm.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
+    //*******************************
+    // BASIC ALARM hh:mm
+    //*******************************
 
     public void createAlarm(Alarm theAlarm) {
         alarmDAO.insert(theAlarm);
-        if (theAlarm.getRepeatTime() > 0) {
-            setRepeatAlarm(theAlarm);
-        } else {
-            setOneTimeAlarm(theAlarm);
+        if (!theAlarm.isCron()) { // Basic alarm
+            if (theAlarm.getRepeatTime() > 0) {
+                setRepeatAlarm(theAlarm);
+            } else {
+                setOneTimeAlarm(theAlarm);
+            }
+        } else { // Advanced alarm
+            setCRONAlarm(theAlarm);
         }
     }
 
     public void setOneTimeAlarm(Alarm theAlarm) {
-        PendingIntent alarmIntent = makeAlarmIntent(theAlarm);
-        Log.d(TAG, "setOneTimeAlarm: start time: "+ theAlarm.getStartTime());
+        PendingIntent alarmIntent = new AlarmActions(context).makeAlarmIntent(theAlarm);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, theAlarm.getStartTime(), alarmIntent);
         } else {
@@ -68,17 +65,23 @@ public class AlarmController {
     }
 
     public void setRepeatAlarm(Alarm theAlarm) {
-        PendingIntent alarmIntent = makeAlarmIntent(theAlarm);
+        PendingIntent alarmIntent = new AlarmActions(context).makeAlarmIntent(theAlarm);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, theAlarm.getStartTime(),
                 theAlarm.getRepeatTime(), alarmIntent);
     }
 
-    public void setAdvancedAlarm(Alarm theAlarm) {
-        // TODO: set advanced alarm
+    public void setCRONAlarm(Alarm theAlarm) {
+        long timeToNext = getMilisTillNextExecution(theAlarm.getCronString());
+        PendingIntent theIntent = new AlarmActions(context).makeCronAlarmIntent(theAlarm);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeToNext, theIntent);
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeToNext, theIntent);
+        }
     }
 
     public void cancelAlarm(Alarm theAlarm) {
-        PendingIntent pendingIntent = makeAlarmIntent(theAlarm);
+        PendingIntent pendingIntent = new AlarmActions(context).makeAlarmIntent(theAlarm);
         alarmManager.cancel(pendingIntent);
     }
 
@@ -92,21 +95,12 @@ public class AlarmController {
         CronParser parser = new CronParser(cronDefinition);
         Cron cron = parser.parse(cronString);
         ExecutionTime executionTime = ExecutionTime.forCron(cron);
-        return  executionTime;
+        return executionTime;
     }
 
-    public long milisTillNextExecution(String cronString) {
+    public long getMilisTillNextExecution(String cronString) {
         ZonedDateTime now = ZonedDateTime.now();
         Optional<Duration> timeToNextExecution = getExecutionTime(cronString).timeToNextExecution(now);
         return timeToNextExecution.get().getNano();
-    }
-
-    public String toHumanText(String cronString) {
-        CronDefinition cronDefinition =
-                CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ);
-        CronParser parser = new CronParser(cronDefinition);
-        CronDescriptor descriptor = CronDescriptor.instance(Locale.ENGLISH);
-        String description = descriptor.describe(parser.parse(cronString));
-        return description;
     }
 }

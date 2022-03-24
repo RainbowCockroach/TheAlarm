@@ -2,36 +2,56 @@ package com.example.thealarm;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Date;
+import android.view.View;
+import android.widget.TextView;
 
 public class AlarmGoOffActivity extends AppCompatActivity {
-
     private static final String TAG = "alarmOffActivity";
+    private Alarm currentTempAlarm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate: ALARM WENT OFF ");
-        // TODO: Hàm đổ chuông các thứ sẽ ở đây
-        // For advanced  alarm: to next alarm
+        setContentView(R.layout.activity_alarm_go_off);
+        // Read params
         Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            String cronString = extras.getString("cron");
-            int alarmId = Integer.parseInt(extras.getString("alarmId"));
-            Log.d(TAG, "onCreate: cron string: "+ cronString);
-            if (cronString != null) {
-                long nextExecuteTime = new AlarmController(this).milisTillNextExecution(cronString);
-                Alarm temp = new Alarm();
-                temp.setId(alarmId);
-                temp.setCronString(cronString);
-                new AlarmController(this).setOneTimeAlarm(temp);
-            }
+        Bundle alarmInfo = extras.getBundle(Constants.KEY_ALARM_OBJECT);
+        Log.d(TAG, "onCreate: extras: ;" + extras);
+        Log.d(TAG, "onCreate: extras: ;" + alarmInfo);
+        if (extras != null && alarmInfo != null) {
+            currentTempAlarm = new AlarmActions(this).buildAlarmFromBundle(alarmInfo);
+            continueCronAlarm();
+            doAlarmAction();
+        }
+    }
+
+    private void turnOffAlarm(View view) {
+        pressHomeButton();
+    }
+
+    /**
+     * Hàm thực hiện các thứ khi báo thức kêu (đổ chuông, captcha...)
+     */
+    public void doAlarmAction() {
+        ((TextView) findViewById(R.id.txt_alarmName_alarmGoOffActivity)).setText(currentTempAlarm.getName());
+    }
+
+    /**
+     * Tắt báo thức, tương tự như bấm nút home
+     */
+    private void pressHomeButton() {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    private void continueCronAlarm() {
+        if (currentTempAlarm.getCronString() != null && currentTempAlarm.getId() != -1) {
+            new AlarmController(this).setCRONAlarm(currentTempAlarm);
         }
     }
 }

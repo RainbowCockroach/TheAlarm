@@ -17,7 +17,7 @@ public class TimerController {
     }
 
     private PendingIntent makeTimerIntent(Timer theTimer) {
-        Intent intent = new Intent(context, Test_AlarmGoOffActivity.class);
+        Intent intent = new Intent(context, AlarmGoOffActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return PendingIntent.getActivity(context, theTimer.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
