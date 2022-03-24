@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TheAlarm">
         <activity
-            android:name=".MainActivity"
+            android:name=".MainActivity1"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
