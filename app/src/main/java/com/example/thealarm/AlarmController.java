@@ -9,8 +9,21 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.cronutils.descriptor.CronDescriptor;
+import com.cronutils.model.Cron;
+import com.cronutils.model.CronType;
+import com.cronutils.model.definition.CronDefinition;
+import com.cronutils.model.definition.CronDefinitionBuilder;
+import com.cronutils.model.time.ExecutionTime;
+import com.cronutils.parser.CronParser;
+import com.google.common.base.Optional;
+
+import org.threeten.bp.Duration;
+import org.threeten.bp.ZonedDateTime;
+
 import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class AlarmController {
     private static final String TAG = "alarmController";
@@ -26,7 +39,11 @@ public class AlarmController {
     }
 
     private PendingIntent makeAlarmIntent(Alarm theAlarm) {
-        Intent intent = new Intent(context, Test_AlarmGoOffActivity.class);
+        Intent intent = new Intent(context, AlarmGoOffActivity.class);
+        intent.putExtra("alarmId", theAlarm.getId());
+        if (theAlarm.getCronString() != null) {
+            intent.putExtra("cron", theAlarm.getCronString());
+        }
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return PendingIntent.getActivity(context, theAlarm.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
@@ -63,5 +80,33 @@ public class AlarmController {
     public void cancelAlarm(Alarm theAlarm) {
         PendingIntent pendingIntent = makeAlarmIntent(theAlarm);
         alarmManager.cancel(pendingIntent);
+    }
+
+    //*******************************
+    // ADVANCED ALARM (CRON)
+    //*******************************
+
+    private ExecutionTime getExecutionTime(String cronString) {
+        CronDefinition cronDefinition =
+                CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ);
+        CronParser parser = new CronParser(cronDefinition);
+        Cron cron = parser.parse(cronString);
+        ExecutionTime executionTime = ExecutionTime.forCron(cron);
+        return  executionTime;
+    }
+
+    public long milisTillNextExecution(String cronString) {
+        ZonedDateTime now = ZonedDateTime.now();
+        Optional<Duration> timeToNextExecution = getExecutionTime(cronString).timeToNextExecution(now);
+        return timeToNextExecution.get().getNano();
+    }
+
+    public String toHumanText(String cronString) {
+        CronDefinition cronDefinition =
+                CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ);
+        CronParser parser = new CronParser(cronDefinition);
+        CronDescriptor descriptor = CronDescriptor.instance(Locale.ENGLISH);
+        String description = descriptor.describe(parser.parse(cronString));
+        return description;
     }
 }

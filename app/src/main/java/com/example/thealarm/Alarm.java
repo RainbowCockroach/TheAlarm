@@ -23,12 +23,16 @@ public class Alarm {
     private long repeatTime;
     // CRON
     @ColumnInfo(name = "cron_time")
-    private String timeString; // Kiểu cron
+    private String cronString; // Kiểu cron
     // OPTIONS
     @ColumnInfo(name = "sound")
     private String sound; // File âm thanh khi báo thức kêu
     @ColumnInfo(name = "group_id")
     private String groupId;
+
+    @Ignore
+    public Alarm() {
+    }
 
     @Ignore
     public Alarm(int hour, int minutes, String name) {
@@ -47,13 +51,13 @@ public class Alarm {
         this.repeatTime = repeatTime;
     }
 
-    public Alarm(int id, String name, boolean isOn, long startTime, long repeatTime, String timeString, String sound, String groupId) {
+    public Alarm(int id, String name, boolean isOn, long startTime, long repeatTime, String cronString, String sound, String groupId) {
         this.id = id;
         this.name = name;
         this.isOn = isOn;
         this.startTime = startTime;
         this.repeatTime = repeatTime;
-        this.timeString = timeString;
+        this.cronString = cronString;
         this.sound = sound;
         this.groupId = groupId;
     }
@@ -110,12 +114,12 @@ public class Alarm {
         this.repeatTime = repeatTime;
     }
 
-    public String getTimeString() {
-        return timeString;
+    public String getCronString() {
+        return cronString;
     }
 
-    public void setTimeString(String timeString) {
-        this.timeString = timeString;
+    public void setCronString(String cronString) {
+        this.cronString = cronString;
     }
 
     public String getSound() {
