@@ -12,7 +12,7 @@ import org.w3c.dom.Text;
 
 import java.util.Calendar;
 
-public class alarm extends AppCompatActivity {
+public class alarmScreen extends AppCompatActivity {
 
 
     @Override
