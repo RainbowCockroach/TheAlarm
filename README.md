@@ -1,5 +1,5 @@
 
-#### Các tính năng của app đồng hồ báo thức thường:
+### Các tính năng của app đồng hồ báo thức thường:
 - Bấm giờ
 - Hẹn giờ
 - Quy đổi múi giờ
@@ -17,3 +17,7 @@
   + Nhập mật khẩu (hoặc hoàn thành thử thách) để tắt hẳn đi, có thể snooze
   + Hoặc là để snooze đã cần nhập mật khẩu (hoặc hoàn thành thử thách)
 - Báo thức nhóm
+
+### Thư viện sử dụng
+https://github.com/jmrozanec/cron-utils
+https://github.com/berk76/soundoftext-java
