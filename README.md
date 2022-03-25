@@ -19,5 +19,5 @@
 - Báo thức nhóm
 
 ### Thư viện sử dụng
-https://github.com/jmrozanec/cron-utils
-https://github.com/berk76/soundoftext-java
+- https://github.com/jmrozanec/cron-utils
+- https://github.com/berk76/soundoftext-java
