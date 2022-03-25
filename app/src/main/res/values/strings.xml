@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">theAlarm</string>
+    <string name="default_alarm_name">Báo thức</string>
+    <string name="btn_turnOff_alarmGoOff">Tắt báo thức</string>
 </resources>
