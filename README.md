@@ -19,5 +19,8 @@
 - Báo thức nhóm
 
 ### Thư viện sử dụng
+- Room database
 - https://github.com/jmrozanec/cron-utils
 - https://github.com/berk76/soundoftext-java
+### Nguồn tham khảo
+- https://github.com/GoogleChromeLabs/cronet-sample
